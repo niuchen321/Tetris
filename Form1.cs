@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -22,6 +23,8 @@ namespace Tetris
         public float height;
         //是否开始
         private bool isRun = false;
+        //当前等级
+        private int Level = 1;
 
         public Form1()
         {
@@ -33,13 +36,17 @@ namespace Tetris
         {
 
         }
-
+        /// <summary>
+        /// 开始游戏
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             timer1.Stop();
             isRun = false;
             pictureBox1.Focus();
-            canvas = new Canvas(25, 30);
+            canvas = new Canvas(15, 20);
 
             //网格宽高
             width = pictureBox1.Width / canvas.Columns;
@@ -49,18 +56,29 @@ namespace Tetris
             isRun = true;
             timer1.Start();
         }
-
+        /// <summary>
+        /// 定时器
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (canvas.Run())
             {
                 Draw();
                 DrawMinCanvas();
-                textBox1.Text = canvas.CurrentScore.ToString();
+                textBox1.Text =$"分数：{canvas.CurrentScore} 分";
 
-                if (canvas.CurrentScore>0&&canvas.CurrentScore%10==0)
+                if (canvas.CurrentScore>0&&canvas.CurrentScore/10>=Level)
                 {
-                    MessageBox.Show("恭喜你升级！");
+                    Level++;
+                    timer1.Stop();
+                    FormMessageBox formMessage = new FormMessageBox($"恭喜你升到{Level}级！");
+                    
+                    formMessage.Show();
+
+                    timer1.Start();
+
                     timer1.Interval += 100;
                 }
             }
@@ -70,11 +88,27 @@ namespace Tetris
                 timer1.Stop();
                 if (canvas.CurrentScore >= 100)
                 {
-                    MessageBox.Show("游戏胜利！！！");                   
+                    if (MessageBox.Show("游戏胜利！是否继续游戏？","提示",MessageBoxButtons.OKCancel,
+           MessageBoxIcon.Question) == DialogResult.OK)
+                    {
+                        button1_Click(sender,e);
+                    }
+                    else
+                    {
+                        Application.Exit();
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("游戏失败！！！");
+                    if (MessageBox.Show("游戏失败！是否继续游戏？", "提示", MessageBoxButtons.OKCancel,
+          MessageBoxIcon.Question) == DialogResult.OK)
+                    {
+                        button1_Click(sender, e);
+                    }
+                    else
+                    {
+                        Application.Exit();
+                    }
                 }
             }
 
@@ -153,7 +187,11 @@ namespace Tetris
             pictureBox2.BackgroundImage = bitmap;
             pictureBox2.Refresh();
         }
-
+        /// <summary>
+        /// 键盘控制砖块
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (isRun)
@@ -213,7 +251,15 @@ namespace Tetris
         /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            if (MessageBox.Show(
+            "窗口关闭后，数据即将丢失！是否现在关闭窗口",
+            "提示",
+            MessageBoxButtons.OKCancel,
+            MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                Application.Exit();
+            }
+           
         }
     }
 }
