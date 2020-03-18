@@ -8,25 +8,12 @@ on:
 
 jobs:
   tetris:
-    runs-on: windows
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Setup .NET Core
+    - name: Setup
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
     - name: Tetris
       run: dotnet tetris MyTetris
-  build:
-    needs: tetris
-    name: Build
-    runs-on: windows
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.101
-    - name: Build 
-      run: dotnet build MyTetris--configuration Release
