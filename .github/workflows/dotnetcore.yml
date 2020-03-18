@@ -1,4 +1,4 @@
-name: .NET Core
+name: Tetris
 
 on:
   push:
@@ -7,9 +7,20 @@ on:
     branches: [ master ]
 
 jobs:
+  tetris:
+    runs-on: windows
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: Tetris
+      run: dotnet tetris MyTetris
   build:
-
-    runs-on: ubuntu-latest
+    needs: tetris
+    name: Build
+    runs-on: windows
 
     steps:
     - uses: actions/checkout@v2
@@ -17,5 +28,5 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
-    - name: Build with dotnet
-      run: dotnet build Tetris--configuration Release
+    - name: Build 
+      run: dotnet build MyTetris--configuration Release
